@@ -4,8 +4,9 @@ const path = require('path');
 const chalk = require('chalk');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
+const appConfig = require('./config.json');
 
-const port = 3000;
+const port = appConfig.webpackPort;
 const url = `http://localhost:${port}`;
 
 const config = {
@@ -13,12 +14,12 @@ const config = {
   entry: [
     `webpack-dev-server/client?${url}`,
     'webpack/hot/dev-server',
-    './src/client.js'
+    './app/client.js',
   ],
   output: {
     path: path.join(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: '/'
+    publicPath: '/',
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
@@ -35,8 +36,8 @@ const config = {
         test: /\.json/,
         loaders: ['json'],
         // exclude: /node_modules/,
-      }
-    ]
+      },
+    ],
   },
 };
 

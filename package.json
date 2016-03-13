@@ -4,7 +4,10 @@
   "description": "An Ethereum experiment",
   "main": "index.js",
   "scripts": {
-    "start": "node dev_server.js"
+    "start": "npm run dev & npm run rpc & npm run api",
+    "dev": "node dev_server.js",
+    "rpc": "ethersim",
+    "api": "babel-node api_server.js"
   },
   "repository": {
     "type": "git",
@@ -31,6 +34,8 @@
     "webpack-dev-server": "^1.14.1"
   },
   "dependencies": {
+    "ethersim": "^0.3.0",
+    "hapi": "^13.2.1",
     "web3": "^0.15.3"
   }
 }
