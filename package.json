@@ -4,10 +4,11 @@
   "description": "An Ethereum experiment",
   "main": "index.js",
   "scripts": {
-    "start": "npm run dev & npm run rpc & npm run api",
-    "dev": "node dev_server.js",
-    "rpc": "ethersim",
-    "api": "babel-node api_server.js"
+    "start": "npm run dev & npm run api",
+    "dev": "node src/server/dev_server.js",
+    "api": "babel-node src/server/api_server.js",
+    "rpc": "geth --identity \"EtheperimentNode\" --genesis ./custom_blockchain/customGenesis.json --rpc --rpcport \"8080\" --rpccorsdomain \"*\" --datadir \"./custom_blockchain\" --port \"8181\" --nodiscover --rpcapi \"db,eth,net,web3\" --networkid 1999 console",
+    "reset_blockchain": "mkdir -p tmp_rb/keystore && cp custom_blockchain/customGenesis.json tmp_rb && cp custom_blockchain/keystore/UTC--2016-03-13T19-43-27.107512282Z--bcddf4e10154518dfa25488efd295a3d192e0601 tmp_rb/keystore && rm -rf custom_blockchain/* && cp -R tmp_rb/* custom_blockchain && rm -rf tmp_rb"
   },
   "repository": {
     "type": "git",
@@ -15,7 +16,8 @@
   },
   "keywords": [
     "Ethereum",
-    "ether"
+    "ether",
+    "blockchain"
   ],
   "author": "David Hérault <dherault@gmail.com> (https://github.com/dherault)",
   "license": "GPL-3.0",
@@ -34,7 +36,6 @@
     "webpack-dev-server": "^1.14.1"
   },
   "dependencies": {
-    "ethersim": "^0.3.0",
     "hapi": "^13.2.1",
     "web3": "^0.15.3"
   }

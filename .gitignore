@@ -31,3 +31,8 @@ node_modules
 
 # Optional REPL history
 .node_repl_history
+
+# This project
+custom_blockchain/**
+!custom_blockchain/customGenesis.json
+!custom_blockchain/keystore/UTC--2016-03-13T19-43-27.107512282Z--bcddf4e10154518dfa25488efd295a3d192e0601

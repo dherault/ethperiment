@@ -4,20 +4,21 @@ const path = require('path');
 const chalk = require('chalk');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
-const appConfig = require('./config.json');
+const appConfig = require('../config.json');
 
 const port = appConfig.webpackPort;
 const url = `http://localhost:${port}`;
+const distDir = path.resolve(__dirname, '../../dist');
 
 const config = {
   devtool: 'cheap-module-eval-source-map',
   entry: [
     `webpack-dev-server/client?${url}`,
     'webpack/hot/dev-server',
-    './app/client.js',
+    path.resolve(__dirname, '../client/client.js'),
   ],
   output: {
-    path: path.join(__dirname, 'dist'),
+    path: distDir,
     filename: 'bundle.js',
     publicPath: '/',
   },
@@ -54,7 +55,7 @@ compiler.plugin('done', () => {
 });
 
 const server = new WebpackDevServer(compiler, {
-  contentBase: './dist',
+  contentBase: distDir,
   publicPath: config.output.publicPath,
   hot: true,
   inline: true,
