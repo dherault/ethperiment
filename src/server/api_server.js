@@ -11,15 +11,19 @@ server.connection({ port });
 
 server.route({
   method: 'GET',
-  path: '/new_account',
+  path: '/readAccount',
   config: {
     cors: true
   },
   handler: (request, reply) => {
-    console.log('new_account');
+    console.log('retrieve_account');
     const response = reply.response().hold();
     
-    response.send();
+    response.send({
+      address: 'test',
+      keystore: 'test',
+      balance: 0,
+    });
   }
 });
 

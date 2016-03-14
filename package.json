@@ -7,7 +7,7 @@
     "start": "npm run dev & npm run api",
     "dev": "node src/server/dev_server.js",
     "api": "babel-node src/server/api_server.js",
-    "rpc": "geth --identity \"EtheperimentNode\" --genesis ./custom_blockchain/customGenesis.json --rpc --rpcport \"8080\" --rpccorsdomain \"*\" --datadir \"./custom_blockchain\" --port \"8181\" --nodiscover --rpcapi \"db,eth,net,web3\" --networkid 1999 console",
+    "rpc": "geth --identity \"EtheperimentNode\" --genesis ./custom_blockchain/customGenesis.json --rpc --rpcport \"8080\" --rpcaddr \"0.0.0.0\" --rpccorsdomain \"*\" --datadir \"./custom_blockchain\" --port \"8181\" --nodiscover --rpcapi \"db,eth,net,web3\" --networkid 1999 console",
     "reset_blockchain": "mkdir -p tmp_rb/keystore && cp custom_blockchain/customGenesis.json tmp_rb && cp custom_blockchain/keystore/UTC--2016-03-13T19-43-27.107512282Z--bcddf4e10154518dfa25488efd295a3d192e0601 tmp_rb/keystore && rm -rf custom_blockchain/* && cp -R tmp_rb/* custom_blockchain && rm -rf tmp_rb"
   },
   "repository": {
@@ -29,6 +29,7 @@
     "babel-core": "^6.7.2",
     "babel-loader": "^6.2.4",
     "babel-preset-es2015": "^6.6.0",
+    "babel-preset-react": "^6.5.0",
     "babel-preset-stage-2": "^6.5.0",
     "chalk": "^1.1.1",
     "json-loader": "^0.5.4",
@@ -37,6 +38,11 @@
   },
   "dependencies": {
     "hapi": "^13.2.1",
+    "lodash.isplainobject": "^4.0.3",
+    "react": "^0.14.7",
+    "react-dom": "^0.14.7",
+    "react-redux": "^4.4.1",
+    "redux": "^3.3.1",
     "web3": "^0.15.3"
   }
 }
