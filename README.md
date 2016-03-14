@@ -3,13 +3,15 @@ An Ethereum experimentation. :curly_loop:
 
 WIP
 
+### Installation
+
+`npm i -g nodemon babel-cli && npm i` and install [geth](https://github.com/ethereum/go-ethereum/wiki)
+
 ### Usage
 
-`npm install` and install [geth](https://github.com/ethereum/go-ethereum/wiki)
+`npm run rpc` to launch the custom RPC server/node (listens on 0.0.0.0, I work on a VM)
 
 `npm start` to launch both dev and api servers
-
-`npm run rpc` to launch the custom RPC server/node (listens on 0.0.0.0, I work on a VM)
 
 `npm run reset_blockchain` to reset every block/tnx/accounts in the blockchain
 
