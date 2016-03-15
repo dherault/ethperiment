@@ -7,7 +7,12 @@ export default class AccountManager extends React.Component {
     super();
     this.state = {
       password: '',
+      revealed: false,
     };
+  }
+  
+  componentDidMount() {
+    this.props.dispatch(readAccounts());
   }
   
   handleInput(key, e) {
@@ -16,8 +21,10 @@ export default class AccountManager extends React.Component {
     });
   }
   
-  componentDidMount() {
-    this.props.dispatch(readAccounts());
+  handleRevealClick(e) {
+    this.setState({
+      revealed: !this.state.revealed
+    });
   }
   
   handleReadAccounts(e) {
@@ -33,9 +40,10 @@ export default class AccountManager extends React.Component {
     }));
   }
   
+  
   render() {
-    
     const { accounts } = this.props;
+    const { revealed, password } = this.state;
     const accountsKeys = Object.keys(accounts);
     
     const table_s = {
@@ -52,6 +60,15 @@ export default class AccountManager extends React.Component {
     const thBalance_s = {
       textAlign: 'left',
       width: '20%',
+    };
+    const reveal_s = {
+      cursor: 'pointer',
+      WebkitTouchCallout: 'none',
+      WebkitUserSelect: 'none',
+      KhtmlUserSelect: 'none',
+      MozUserSelect: 'none',
+      MsUserSelect: 'none',
+      userSelect: 'none',
     };
     
     return <div>
@@ -85,15 +102,19 @@ export default class AccountManager extends React.Component {
         <div>Warning: There is no way of retrieving your password, do not forget it or you will loose your account forever.</div>
         <form onSubmit={this.handleCreateAccount.bind(this)}>
           <input 
-            type='password'
-            value={this.state.password} 
+            type={revealed ? 'text' : 'password'}
+            value={password} 
             placeholder='Password'
             onChange={this.handleInput.bind(this, 'password')} />
           <input
             disabled={!this.state.password.length}
             type='submit'
             value='Go!' />
-          </form>
+          <span style={reveal_s} onClick={this.handleRevealClick.bind(this)}>
+            <input type='checkbox' checked={revealed} /> 
+            Reveal password
+          </span>
+        </form>
       </div>
     </div>;
   }
@@ -126,6 +147,12 @@ class AccountRow extends React.Component {
     const getKeystore_s = {
       cursor: 'pointer',
       textDecoration: this.state.hovered ? 'underline' : 'none',
+      WebkitTouchCallout: 'none',
+      WebkitUserSelect: 'none',
+      KhtmlUserSelect: 'none',
+      MozUserSelect: 'none',
+      MsUserSelect: 'none',
+      userSelect: 'none',
     };
     
     return <tr>

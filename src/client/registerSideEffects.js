@@ -1,13 +1,20 @@
-import { readBalance } from './actionCreators'
+import { readAccounts, readBalance } from './actionCreators'
 
-export default function registerSideEffect({ subscribe, dispatch, getState}) {
+export default function registerSideEffect({ subscribe, dispatch, getState }) {
+  
+  const internals = {};
   
   const sideEffects = {
-    SUCCESS_READ_ACCOUNTS: (action) => {
-      action.payload.forEach(address => {
-        dispatch(readBalance({ address }));
-      });
-    },
+    
+    // For each retrieved account, read its balance
+    SUCCESS_READ_ACCOUNTS: ({ payload }) => payload.forEach(address => dispatch(readBalance({ address }))),
+    
+    // Allows refreshing after reconnection
+    SUCCESS_READ_INFORMATIONS: ({ payload: { isConnected }}) => {
+      if (internals.isConnected === false && isConnected) dispatch(readAccounts());
+      
+      internals.isConnected = isConnected;
+    }
   };
   
   const seKeys = Object.keys(sideEffects);

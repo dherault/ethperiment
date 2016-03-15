@@ -47,6 +47,12 @@ export default class InformationsDisplay extends React.Component {
     const underlined_s = {
       cursor: 'pointer',
       textDecoration: this.state.hovered ? 'underline' : 'none',
+      WebkitTouchCallout: 'none',
+      WebkitUserSelect: 'none',
+      KhtmlUserSelect: 'none',
+      MozUserSelect: 'none',
+      MsUserSelect: 'none',
+      userSelect: 'none',
     };
     
     return <div>
