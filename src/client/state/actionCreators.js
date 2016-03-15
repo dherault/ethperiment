@@ -1,7 +1,7 @@
 /* global fetch */
 import isPlainObject from 'lodash.isplainobject';
-import appConfig from '../config.json';
-import web3 from './web3';
+import appConfig from '../../config.json';
+import web3 from '../web3';
 
 /* Sync actionCreator */
 

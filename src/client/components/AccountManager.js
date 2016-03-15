@@ -1,5 +1,5 @@
 import React from 'react';
-import { readAccounts, createAccount } from '../actionCreators';
+import { readAccounts, createAccount } from '../state/actionCreators';
 
 export default class AccountManager extends React.Component {
   

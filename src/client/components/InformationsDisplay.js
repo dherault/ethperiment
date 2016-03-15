@@ -1,5 +1,5 @@
 import React from 'react';
-import { readInformations } from '../actionCreators';
+import { readInformations } from '../state/actionCreators';
 
 export default class InformationsDisplay extends React.Component {
   
