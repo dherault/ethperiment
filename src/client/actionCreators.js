@@ -8,13 +8,13 @@ import web3 from './web3';
 /* Async actionCreators */
 export const readAccounts = () => ({
   types: createTypes('readAccounts'),
-  promise: new Promise((resolve, reject) => web3.eth.getAccounts((err, result) => err ? reject(err) : resolve(result)))
+  promise: promisify(web3.eth.getAccounts),
 });
 
 export const readBalance = ({ address }) => ({
   params: { address },
   types: createTypes('readBalance'),
-  promise: new Promise((resolve, reject) => web3.eth.getBalance(address, (err, result) => err ? reject(err) : resolve(result.toString(10))))
+  promise: promisify(web3.eth.getBalance, address).then(x => x.toString(10)), // Big number stringification
 });
 
 export const createAccount = createActionCreator('createAccount');
@@ -27,14 +27,14 @@ export const readInformations = () => !web3.isConnected() ? {
   } : {
     types: createTypes('readInformations'),
     promise: Promise.all([
-      new Promise((a, b) => web3.version.getNode((e, x) => e ? b(e) : a(x))),
-      new Promise((a, b) => web3.net.getListening((e, x) => e ? b(e) : a(x))),
-      new Promise((a, b) => web3.net.getPeerCount((e, x) => e ? b(e) : a(x))),
-      new Promise((a, b) => web3.eth.getMining((e, x) => e ? b(e) : a(x))),
-      new Promise((a, b) => web3.eth.getCoinbase((e, x) => e ? b(e) : a(x))),
-      new Promise((a, b) => web3.eth.getHashrate((e, x) => e ? b(e) : a(x))),
-      new Promise((a, b) => web3.eth.getGasPrice((e, x) => e ? b(e) : a(x))),
-      new Promise((a, b) => web3.eth.getBlockNumber((e, x) => e ? b(e) : a(x))),
+      promisify(web3.version.getNode),
+      promisify(web3.net.getListening),
+      promisify(web3.net.getPeerCount),
+      promisify(web3.eth.getMining),
+      promisify(web3.eth.getCoinbase),
+      promisify(web3.eth.getHashrate),
+      promisify(web3.eth.getGasPrice),
+      promisify(web3.eth.getBlockNumber),
     ]).then(([node, isListening, peerCount, isMining, coinbase, hashrate, gasPrice, blockNumber]) => ({
       node, isListening, peerCount, isMining, coinbase, hashrate, blockNumber,
       gasPrice: gasPrice.toString(10),
@@ -42,7 +42,8 @@ export const readInformations = () => !web3.isConnected() ? {
       defaultAccount: web3.eth.defaultAccount,
       defaultBlock: web3.eth.defaultBlock
     }))
-};
+  };
+
 // Creates async actionCreators that call the API
 function createActionCreator(intention) {
   
@@ -62,7 +63,10 @@ function createActionCreator(intention) {
         headers: {
           ['Content-Type']: 'application/json',
         },
-      }).then(checkStatus).then(r => r.json())
+      }).then((response) => {
+        if (response.status >= 200 && response.status < 300) return response.json();
+        else throw response;
+      })
     };
   };
 }
@@ -71,10 +75,6 @@ function createTypes(intention) {
   return ['REQUEST', 'SUCCESS', 'FAILURE'].map(t => `${t}_${intention.replace(/[A-Z]/g, '_$&')}`.toUpperCase());
 }
 
-function checkStatus(response) {
-  if (response.status >= 200 && response.status < 300) {
-    return response;
-  } else {
-    throw response;
-  }
+function promisify(fun, ...args) {
+  return new Promise((resolve, reject) => fun(...args, (err, result) => err ? reject(err) : resolve(result)));
 }
