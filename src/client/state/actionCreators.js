@@ -4,8 +4,13 @@ import appConfig from '../../config.json';
 import web3 from '../web3';
 
 /* Sync actionCreator */
+// none!
 
 /* Async actionCreators */
+
+export const createAccount = createActionCreator('POST', 'createAccount');
+export const readKeyfile = createActionCreator('GET', 'readKeyfile');
+
 export const readAccounts = () => ({
   types: createTypes('readAccounts'),
   promise: promisify(web3.eth.getAccounts),
@@ -16,8 +21,6 @@ export const readBalance = ({ address }) => ({
   types: createTypes('readBalance'),
   promise: promisify(web3.eth.getBalance, address).then(x => x.toString(10)), // Big number stringification
 });
-
-export const createAccount = createActionCreator('createAccount');
 
 export const readInformations = () => !web3.isConnected() ? {
     type: 'SUCCESS_READ_INFORMATIONS',
@@ -45,7 +48,7 @@ export const readInformations = () => !web3.isConnected() ? {
   };
 
 // Creates async actionCreators that call the API
-function createActionCreator(intention) {
+function createActionCreator(method, intention) {
   
   return (params) => {
     
@@ -53,17 +56,31 @@ function createActionCreator(intention) {
     
     console.log('.A.', intention, params);
     
+    const m = method.toUpperCase();
+    const options = { method: m };
+    let urlWithQuery = `http://localhost:${appConfig.apiPort}/${intention}`;
+  
+    if (m === 'POST' || m === 'PUT') {
+      options.body = JSON.stringify(params);
+      options.headers = { ['Content-Type']: 'application/json' };
+      
+    } else {
+      // URI construction
+      urlWithQuery += '?';
+      let addAnd = false;
+      
+      for (let key in params) {
+        const val = params[key];
+        addAnd ? urlWithQuery += '&' : addAnd = true;
+        if (val) urlWithQuery += `${encodeURIComponent(key)}=${encodeURIComponent(val)}`;
+      }
+    }
+    
     return {
       intention,
       params,
       types: createTypes(intention),
-      promise: fetch(`http://localhost:${appConfig.apiPort}/${intention}`, { 
-        method: 'POST', // This project only uses POST method
-        body: JSON.stringify(params),
-        headers: {
-          ['Content-Type']: 'application/json',
-        },
-      }).then((response) => {
+      promise: fetch(urlWithQuery, options).then((response) => {
         if (response.status >= 200 && response.status < 300) return response.json();
         else throw response;
       })

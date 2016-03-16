@@ -1,5 +1,5 @@
 import React from 'react';
-import { readAccounts, createAccount } from '../state/actionCreators';
+import { readAccounts, createAccount, readKeyfile } from '../state/actionCreators';
 
 export default class AccountManager extends React.Component {
   
@@ -86,7 +86,7 @@ export default class AccountManager extends React.Component {
             </thead>
             <tbody>
             {
-              accountsKeys.map((key, pos) => <AccountRow key={pos} account={accounts[key]} pos={pos} />)
+              accountsKeys.map((key, pos) => <AccountRow key={pos} dispatch={this.props.dispatch} account={accounts[key]} pos={pos} />)
             }
             </tbody>
           </table>
@@ -135,6 +135,12 @@ class AccountRow extends React.Component {
     });
   } 
   
+  handleClick() {
+    this.props.dispatch(readKeyfile({
+      address: this.props.account.address
+    }));
+  }
+  
   render() {
     
     const { pos, account: { address, balance } } = this.props;
@@ -159,7 +165,7 @@ class AccountRow extends React.Component {
       <td style={td_s}>{pos + 1}</td>
       <td style={td_s}>{address}</td>
       <td style={td_s}>{balance ? `${balance} wei` : ''}</td>
-      <td style={td_s}><span style={getKeystore_s} onMouseEnter={handleHover} onMouseLeave={handleHover}>Get keystore file</span></td>
+      <td style={td_s}><span style={getKeystore_s} onMouseEnter={handleHover} onMouseLeave={handleHover} onClick={this.handleClick.bind(this)}>Get keystore file</span></td>
     </tr>;
   }
 }

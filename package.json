@@ -39,6 +39,7 @@
   "dependencies": {
     "boom": "^3.1.2",
     "hapi": "^13.2.1",
+    "inert": "^3.2.0",
     "lodash.isplainobject": "^4.0.3",
     "react": "^0.14.7",
     "react-dom": "^0.14.7",

@@ -1,6 +1,9 @@
 import React from 'react';
 import { readInformations } from '../state/actionCreators';
 
+const POOL_LIKE_CRAZY = false;
+const POOL_PERIOD = 3000; //ms
+
 export default class InformationsDisplay extends React.Component {
   
   constructor() {
@@ -13,11 +16,11 @@ export default class InformationsDisplay extends React.Component {
   
   componentDidMount() {
     this.props.dispatch(readInformations());
-    this.timer = setInterval(() => this.props.dispatch(readInformations()), 3000);
+    if (POOL_LIKE_CRAZY) this.timer = setInterval(() => this.props.dispatch(readInformations()), POOL_PERIOD);
   }
   
   componentWillUnmount() {
-    clearInterval(this.timer);
+    if (POOL_LIKE_CRAZY) clearInterval(this.timer);
   }
   
   handleHover() {

@@ -1,30 +1,34 @@
 import fs from 'fs';
 import path from 'path';
 import { exec } from 'child_process';
+
 import hapi from 'hapi';
 import boom from 'boom';
-// import Web3 from 'web3';
+import inert from 'inert';
+
 import appConfig from '../config.json';
 
 const port = appConfig.apiPort;
 const ethereumDataDir = path.resolve(__dirname, '../../custom_blockchain');
-// const web3 = new Web3(new Web3.providers.HttpProvider(`http://localhost:${appConfig.rpcPort}`));
 const server = new hapi.Server();
 
 server.connection({ port });
+server.register(inert, () => {}); // adds .file() method to hapijs's reply object
 
+const config = { cors: true }; // Welcome to the party
+const keystoreDir = path.resolve(__dirname, '../../custom_blockchain/keystore');
+
+/* ACCOUNT CREATION */
 server.route({
+  config,
   method: 'POST',
   path: '/createAccount',
-  config: {
-    cors: true
-  },
   handler: (request, reply) => {
     console.log('createAccount');
     
     // Let's check for a password in the payload
+    if (!request.payload) return reply(boom.badRequest('Missing payload'));
     const { password } = request.payload;
-    
     if (!password) return reply(boom.badRequest('Missing password in payload'));
     if (typeof password !== 'string') return reply(boom.badRequest('Expected password to be a string'));
     
@@ -56,14 +60,37 @@ server.route({
   }
 });
 
-// if (web3.isConnected()) {
-//   server.start(err => {
-//     if (err) return console.log(err.stack);
-//     console.log(`API listening on port ${port}.`);
-//   });
-// } else {
-//   console.log('API error: no RPC connection.');
-// }
+/* KEYFILE RETRIEVAL */
+server.route({
+  config,
+  method: 'GET',
+  path: '/readKeyfile',
+  handler: (request, reply) => {
+    console.log('readKeyfile');
+    
+    // Let's check for an address in the payload
+    if (!request.query) return reply(boom.badRequest('Missing query'));
+    const { address } = request.query;
+    if (!address) return reply(boom.badRequest('Missing address in query'));
+    if (typeof address !== 'string') return reply(boom.badRequest('Expected address to be a string'));
+    
+    const nonHexAddress = address.startsWith('0x') ? address.substring(2) : address;
+    
+    // Sync... because we can't call reply.file if we invoke reply.reponse.hold() to do async stuff
+    // Can't call reply twice...
+    const filename = fs.readdirSync(keystoreDir).find(name => name.endsWith(nonHexAddress));
+    if (!filename) {
+      console.log('Keyfile not found:', nonHexAddress);
+      return reply(boom.notFound());
+    }
+    
+    console.log('Found keyfile:', filename);
+    reply.file(`${keystoreDir}/${filename}`, {
+      mode: 'attachment' // includes the 'Content-Disposition' header with the response
+    });
+  }
+});
+
 server.start(err => {
   if (err) return console.log(err.stack);
   console.log(`API listening on port ${port}.`);

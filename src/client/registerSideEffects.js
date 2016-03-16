@@ -25,7 +25,7 @@ export default function registerSideEffect({ subscribe, dispatch, getState }) {
     const lastAction = state.records[state.records.length - 1];
     const lastActionType = lastAction.type;
     
-    if (seKeys.includes(lastActionType)) {
+    if (seKeys.indexOf(lastActionType) !== -1) {
       console.log('.E.', `Found side effect for ${lastActionType}`);
       sideEffects[lastActionType](lastAction, state);
     }
