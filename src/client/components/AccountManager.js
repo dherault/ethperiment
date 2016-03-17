@@ -42,7 +42,7 @@ export default class AccountManager extends React.Component {
   
   
   render() {
-    const { accounts } = this.props;
+    const { accounts, dispatch } = this.props;
     const { revealed, password } = this.state;
     const accountsKeys = Object.keys(accounts);
     
@@ -86,7 +86,7 @@ export default class AccountManager extends React.Component {
             </thead>
             <tbody>
             {
-              accountsKeys.map((key, pos) => <AccountRow key={pos} dispatch={this.props.dispatch} account={accounts[key]} pos={pos} />)
+              accountsKeys.map((key, pos) => <AccountRow key={pos} dispatch={dispatch} account={accounts[key]} pos={pos} />)
             }
             </tbody>
           </table>
@@ -136,9 +136,14 @@ class AccountRow extends React.Component {
   } 
   
   handleClick() {
-    this.props.dispatch(readKeyfile({
-      address: this.props.account.address
-    }));
+    // this.props.dispatch(readKeyfile({
+    //   address: this.props.account.address
+    // }));
+    const xhr = new XMLHttpRequest();
+    
+    xhr.onError = err => console.log(err);
+    xhr.open('GET', 'http://localhost:3001/readKeyfile?address=' + this.props.account.address, true);
+    xhr.send();
   }
   
   render() {

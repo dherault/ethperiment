@@ -61,6 +61,37 @@ server.route({
 });
 
 /* KEYFILE RETRIEVAL */
+// server.route({
+//   config,
+//   method: 'GET',
+//   path: '/readKeyfile',
+//   handler: (request, reply) => {
+//     console.log('readKeyfile');
+    
+//     // Let's check for an address in the payload
+//     if (!request.query) return reply(boom.badRequest('Missing query'));
+//     const { address } = request.query;
+//     if (!address) return reply(boom.badRequest('Missing address in query'));
+//     if (typeof address !== 'string') return reply(boom.badRequest('Expected address to be a string'));
+    
+//     const nonHexAddress = address.startsWith('0x') ? address.substring(2) : address;
+    
+//     // Sync... because we can't call reply.file if we invoke reply.reponse.hold() to do async stuff
+//     // Can't call reply twice...
+//     const filename = fs.readdirSync(keystoreDir).find(name => name.endsWith(nonHexAddress));
+//     if (!filename) {
+//       console.log('Keyfile not found:', nonHexAddress);
+//       return reply(boom.notFound());
+//     }
+    
+//     console.log('Found keyfile:', filename);
+//     reply.response.header('Content-Type', 'application/x-download');
+//     // reply.file(`${keystoreDir}/${filename}`, {
+//     reply.file(`${__dirname}/api_server.js`, {
+//       mode: 'attachment' // includes the 'Content-Disposition' header with the response
+//     });
+//   }
+// });
 server.route({
   config,
   method: 'GET',
@@ -74,19 +105,32 @@ server.route({
     if (!address) return reply(boom.badRequest('Missing address in query'));
     if (typeof address !== 'string') return reply(boom.badRequest('Expected address to be a string'));
     
-    const nonHexAddress = address.startsWith('0x') ? address.substring(2) : address;
+    const response = reply.response().hold();
     
-    // Sync... because we can't call reply.file if we invoke reply.reponse.hold() to do async stuff
-    // Can't call reply twice...
-    const filename = fs.readdirSync(keystoreDir).find(name => name.endsWith(nonHexAddress));
-    if (!filename) {
-      console.log('Keyfile not found:', nonHexAddress);
-      return reply(boom.notFound());
-    }
-    
-    console.log('Found keyfile:', filename);
-    reply.file(`${keystoreDir}/${filename}`, {
-      mode: 'attachment' // includes the 'Content-Disposition' header with the response
+    fs.readdir(keystoreDir, (err, files) => {
+      if (err) return reply500(response, err);
+      
+      const nonHexAddress = address.startsWith('0x') ? address.substring(2) : address;
+      const filename = files.find(name => name.endsWith(nonHexAddress));
+      
+      if (!filename) {
+        console.log('Keyfile not found:', nonHexAddress);
+        response.statusCode = 404;
+        response.source = 'Not found.';
+        return response.send();
+      }
+      
+      console.log('Found keyfile:', filename);
+      
+      fs.readFile(`${keystoreDir}/${filename}`, (err, data) => {
+        if (err) return reply500(response, err);
+        
+        response.source = data;
+        response.header('Content-Type', 'application/x-download');
+        response.header('Content-Disposition', `attachment filename="${filename}"`);
+        // response.charset('utf-8');
+        response.send();
+      });
     });
   }
 });
