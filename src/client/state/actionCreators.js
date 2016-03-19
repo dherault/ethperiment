@@ -9,43 +9,48 @@ import web3 from '../web3';
 /* Async actionCreators */
 
 export const createAccount = createActionCreator('POST', 'createAccount');
-export const readKeyfile = createActionCreator('GET', 'readKeyfile');
 
 export const readAccounts = () => ({
   types: createTypes('readAccounts'),
   promise: promisify(web3.eth.getAccounts),
 });
 
-export const readBalance = ({ address }) => ({
-  params: { address },
+export const readBalance = ({ hexAddress }) => ({
+  params: { hexAddress },
   types: createTypes('readBalance'),
-  promise: promisify(web3.eth.getBalance, address).then(x => x.toString(10)), // Big number stringification
+  promise: promisify(web3.eth.getBalance, hexAddress).then(x => x.toString(10)), // Big number stringification
 });
 
 export const readInformations = () => !web3.isConnected() ? {
-    type: 'SUCCESS_READ_INFORMATIONS',
-    payload: {
-      isConnected: false,
-    }
-  } : {
-    types: createTypes('readInformations'),
-    promise: Promise.all([
-      promisify(web3.version.getNode),
-      promisify(web3.net.getListening),
-      promisify(web3.net.getPeerCount),
-      promisify(web3.eth.getMining),
-      promisify(web3.eth.getCoinbase),
-      promisify(web3.eth.getHashrate),
-      promisify(web3.eth.getGasPrice),
-      promisify(web3.eth.getBlockNumber),
-    ]).then(([node, isListening, peerCount, isMining, coinbase, hashrate, gasPrice, blockNumber]) => ({
-      node, isListening, peerCount, isMining, coinbase, hashrate, blockNumber,
-      gasPrice: gasPrice.toString(10),
-      isConnected: true,
-      defaultAccount: web3.eth.defaultAccount,
-      defaultBlock: web3.eth.defaultBlock
-    }))
-  };
+  type: 'SUCCESS_READ_INFORMATIONS',
+  payload: {
+    isConnected: false,
+  }
+} : {
+  types: createTypes('readInformations'),
+  promise: Promise.all([
+    promisify(web3.version.getNode),
+    promisify(web3.net.getListening),
+    promisify(web3.net.getPeerCount),
+    promisify(web3.eth.getMining),
+    promisify(web3.eth.getCoinbase),
+    promisify(web3.eth.getHashrate),
+    promisify(web3.eth.getGasPrice),
+    promisify(web3.eth.getBlockNumber),
+  ]).then(([node, isListening, peerCount, isMining, coinbase, hashrate, gasPrice, blockNumber]) => ({
+    node, isListening, peerCount, isMining, coinbase, hashrate, blockNumber,
+    gasPrice: gasPrice.toString(10),
+    isConnected: true,
+    defaultAccount: web3.eth.defaultAccount,
+    defaultBlock: web3.eth.defaultBlock
+  }))
+};
+
+export const createTransaction = ({ from, to, value }) => ({
+  params: { from, to, value },
+  types: createTypes('createTransaction'),
+  promise: promisify(web3.eth.sendTransaction, { from, to, value })
+});
 
 // Creates async actionCreators that call the API
 function createActionCreator(method, intention) {
@@ -80,7 +85,7 @@ function createActionCreator(method, intention) {
       intention,
       params,
       types: createTypes(intention),
-      promise: fetch(urlWithQuery, options).then((response) => {
+      promise: fetch(urlWithQuery, options).then(response => {
         if (response.status >= 200 && response.status < 300) return response.json();
         else throw response;
       })

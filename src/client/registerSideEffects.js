@@ -1,4 +1,4 @@
-import { readAccounts, readBalance } from './state/actionCreators'
+import { readAccounts, readBalance } from './state/actionCreators';
 
 export default function registerSideEffect({ subscribe, dispatch, getState }) {
   
@@ -7,7 +7,7 @@ export default function registerSideEffect({ subscribe, dispatch, getState }) {
   const sideEffects = {
     
     // For each retrieved account, read its balance
-    SUCCESS_READ_ACCOUNTS: ({ payload }) => payload.forEach(address => dispatch(readBalance({ address }))),
+    SUCCESS_READ_ACCOUNTS: ({ payload }) => payload.forEach(hexAddress => dispatch(readBalance({ hexAddress }))),
     
     // Allows refreshing after reconnection
     SUCCESS_READ_INFORMATIONS: ({ payload: { isConnected }}) => {

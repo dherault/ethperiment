@@ -13,13 +13,17 @@ WIP
 
 `npm start` to launch both dev and api servers
 
-`npm run reset_blockchain` to reset every block/tnx/accounts in the blockchain
+`npm run reset` to reset every block/tnx/accounts in the blockchain
 
 ### Blockchain
 
 This project uses a custom local blockchain, with 20 Ethers allocated to this EOA:
 - Address: bcddf4e10154518dfa25488efd295a3d192e0601
 - Passphrase: password
+
+### Notes
+
+This project displays no React best pratices and is focused on the blockchain.
 
 ### License
 
