@@ -23,7 +23,11 @@ export default {
         const newState = {};
         action.payload.forEach(hexAddress => {
           const address = hexAddress.substring(2);
-          newState[address] = { address, balance: '' };
+          newState[address] = { 
+            address, 
+            balance: '',
+            
+          };
         });
         return newState;
       }

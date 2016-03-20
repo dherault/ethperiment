@@ -19,7 +19,7 @@ export default class ErrorBar extends React.Component {
       
       this.setState({
         message: payload.message || JSON.stringify(payload),
-        timeout: setTimeout(() => this.setState({ message: '' }), 3000),
+        timeout: setTimeout(() => this.setState({ message: '' }), 3500),
       });
     }
   }
